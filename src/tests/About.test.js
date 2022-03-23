@@ -17,4 +17,7 @@ test('A página contém as informações sobre a Pokédex', () => {
 
   const p2 = screen.getByText(/Pokémons by type, and see more/i);
   expect(p2).toBeInTheDocument();
+
+  const { src } = screen.getByRole('img');
+  expect(src).toEqual('https://cdn2.bulbagarden.net/upload/thumb/8/86/Gen_I_Pok%C3%A9dex.png/800px-Gen_I_Pok%C3%A9dex.png');
 });
