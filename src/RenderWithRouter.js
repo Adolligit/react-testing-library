@@ -11,6 +11,6 @@ export function renderWithRouter(component) {
         {component}
       </Router>
     ),
-    history,
+    history
   };
 }
