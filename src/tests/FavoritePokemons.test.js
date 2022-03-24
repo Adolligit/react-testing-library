@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { renderWithRouter } from '../RenderWithRouter';
 import App from '../App';
 
-describe('Name of the group', () => {
+describe('Validando interação com o favorito', () => {
   test('Não há card favorito, assim é exibida uma mensagem', () => {
     renderWithRouter(<App />);
 
