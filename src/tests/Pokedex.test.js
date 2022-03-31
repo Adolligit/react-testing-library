@@ -5,7 +5,8 @@ import { renderWithRouter } from '../RenderWithRouter';
 import App from '../App';
 import data from '../data';
 
-const POKEMON_NAME = 'pokemon-name'; // lint nojento
+const POKEMON_NAME = 'pokemon-name'; // lint
+const POKEMON_TYPE = 'pokemon-type'; // nojento
 
 describe('Certificação de elementos na página', () => {
   beforeEach(() => renderWithRouter(<App />));
@@ -15,7 +16,7 @@ describe('Certificação de elementos na página', () => {
     expect(screen.getByText('Pokédex')).toBeInTheDocument();
   });
 
-  test('Existem os botões "All", "Próximo pokémon" e com os tipos dos pokémons', () => {
+  test('Existem os botões "All", "Próximo pokémon" e com os tipos dos Pokémons', () => {
     data.forEach(({ type }) => {
       screen.getByRole('button', { name: type });
     });
@@ -35,12 +36,7 @@ describe('Cerficação de dados e interação com o botão "Próximo pokémon"',
 
       expect(currentPokemon).not.toEqual(previousPokemon);
 
-      if (previousPokemon !== currentPokemon) {
-        previousPokemon = currentPokemon;
-      } else {
-        screen.getByText('Vai dar erro se sua lógica estiver errada!');
-      }
-
+      previousPokemon = currentPokemon;
       userEvent.click(screen.getByRole('button', { name: /Próximo pokémon/i }));
     }
   });
@@ -59,7 +55,7 @@ describe('Cerficação de dados e interação com o botão "Próximo pokémon"',
     }
   });
 
-  test.only('Respectivos Pokémons aparecem quando o botão com seu tipo é clicado', () => {
+  test('Respectivos Pokémons aparecem quando o botão com seu tipo é clicado', () => {
     const pokemonTypes = data.map(({ type }) => type);
     const allTypeButtons = screen.getAllByTestId('pokemon-type-button');
 
@@ -77,6 +73,7 @@ describe('Cerficação de dados e interação com o botão "Próximo pokémon"',
     // Uso do Object.keys() por causa do lixo do lint. Preferia "for (let variavel in nomeDoObjeto)"
     Object.keys(pokemonTypeFilter).forEach((pokemonType) => {
       userEvent.click(screen.getByRole('button', { name: pokemonType }));
+      expect(screen.getByRole('button', { name: /All/i })).toBeVisible();
 
       pokemonTypeFilter[pokemonType].forEach((pokemonName) => {
         const nextPokemon = screen.getByRole('button', { name: /Próximo pokémon/i });
@@ -91,5 +88,31 @@ describe('Cerficação de dados e interação com o botão "Próximo pokémon"',
         }
       });
     });
+  });
+});
+
+describe('Interações com o botão "All"', () => {
+  beforeEach(() => renderWithRouter(<App />));
+
+  test('É possível percorrer por todos os Pokémons no início da aplicação', () => {
+    const allPokemonsName = data.map(({ name }) => name);
+    allPokemonsName.forEach((name) => {
+      screen.getByText(name);
+      userEvent.click(screen.getByRole('button', { name: /Próximo pokémon/i }));
+    });
+  });
+
+  test('Pokémons de todos o tipos aparecem ao clicar no botão "All"', () => {
+    const nextPokemon = screen.getByRole('button', { name: /Próximo pokémon/i });
+
+    userEvent.click(screen.getByRole('button', { name: /Fire/i }));
+
+    const fireType = screen.getByTestId(POKEMON_TYPE).textContent;
+
+    userEvent.click(nextPokemon);
+    expect(fireType).toEqual(screen.getByTestId(POKEMON_TYPE).textContent);
+
+    userEvent.click(screen.getByRole('button', { name: /All/i }));
+    expect(fireType).not.toEqual(screen.getByTestId(POKEMON_TYPE).textContent);
   });
 });
