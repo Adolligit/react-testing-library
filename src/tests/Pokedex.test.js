@@ -5,6 +5,8 @@ import { renderWithRouter } from '../RenderWithRouter';
 import App from '../App';
 import data from '../data';
 
+const POKEMON_NAME = 'pokemon-name'; // lint nojento
+
 describe('Certificação de elementos na página', () => {
   beforeEach(() => renderWithRouter(<App />));
 
@@ -29,7 +31,7 @@ describe('Cerficação de dados e interação com o botão "Próximo pokémon"',
     let previousPokemon = null;
 
     for (let i = 0; i < data.length; i += 1) {
-      const currentPokemon = screen.getByTestId('pokemon-name').textContent;
+      const currentPokemon = screen.getByTestId(POKEMON_NAME).textContent;
 
       expect(currentPokemon).not.toEqual(previousPokemon);
 
@@ -50,9 +52,44 @@ describe('Cerficação de dados e interação com o botão "Próximo pokémon"',
       userEvent.click(screen.getByRole('button', { name: /Próximo pokémon/i }));
 
       if (i === data.length - 1) {
-        const currentPokemon = screen.getByTestId('pokemon-name').textContent;
+        const currentPokemon = screen.getByTestId(POKEMON_NAME).textContent;
+
         expect(currentPokemon).toEqual(firstPokemon);
       }
     }
+  });
+
+  test.only('Respectivos Pokémons aparecem quando o botão com seu tipo é clicado', () => {
+    const pokemonTypes = data.map(({ type }) => type);
+    const allTypeButtons = screen.getAllByTestId('pokemon-type-button');
+
+    allTypeButtons
+      .forEach(({ textContent }) => (
+        expect(pokemonTypes.includes(textContent)).toBeTruthy()
+      ));
+
+    const pokemonTypeFilter = data.reduce((acc, { type, name }) => (
+      {
+        ...acc,
+        [type]: (acc[type]) ? [...acc[type], name] : [name],
+      }), {});
+
+    // Uso do Object.keys() por causa do lixo do lint. Preferia "for (let variavel in nomeDoObjeto)"
+    Object.keys(pokemonTypeFilter).forEach((pokemonType) => {
+      userEvent.click(screen.getByRole('button', { name: pokemonType }));
+
+      pokemonTypeFilter[pokemonType].forEach((pokemonName) => {
+        const nextPokemon = screen.getByRole('button', { name: /Próximo pokémon/i });
+        const { textContent } = screen.getByTestId(POKEMON_NAME);
+
+        expect(textContent).toEqual(pokemonName);
+
+        if (pokemonTypeFilter[pokemonType].length === 1) {
+          expect(nextPokemon.disabled).toBeTruthy();
+        } else {
+          userEvent.click(nextPokemon);
+        }
+      });
+    });
   });
 });
