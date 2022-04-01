@@ -96,6 +96,7 @@ describe('Interações com o botão "All"', () => {
 
   test('É possível percorrer por todos os Pokémons no início da aplicação', () => {
     const allPokemonsName = data.map(({ name }) => name);
+
     allPokemonsName.forEach((name) => {
       screen.getByText(name);
       userEvent.click(screen.getByRole('button', { name: /Próximo pokémon/i }));
