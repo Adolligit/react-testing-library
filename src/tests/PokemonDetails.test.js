@@ -4,7 +4,7 @@ import { screen } from '@testing-library/react';
 import { renderWithRouter } from '../RenderWithRouter';
 import App from '../App';
 
-const SRC = "https://cdn2.bulbagarden.net/upload/0/08/Kanto_Route_2_Map.png";
+const SRC = 'https://cdn2.bulbagarden.net/upload/0/08/Kanto_Route_2_Map.png';
 
 test('Parágrafos, títulos  e imagens são corretamente criados na página', () => {
   renderWithRouter(<App />);
